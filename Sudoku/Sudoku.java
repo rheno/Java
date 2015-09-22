@@ -7,74 +7,71 @@ import java.util.Scanner;
 class SudokuSolver {
 
 	int[][] matrix;
+	int col, row;
 
 	public SudokuSolver(int[][] m) {
 		matrix = m;
 	}
-
-	/* Check if position matrix safe */
-	private boolean isSafe(int x, int y) {
-		if (x < 0 || y < 0) {
-			return false;
-		} else if (x >= 9 || y >= 9) {
-			return false;
+	
+	/* Check if matrix is already filled all */
+	private boolean isFull(){
+		for(int i=0;i<9;i++){
+			for(int j=0;j<9;j++){
+				if(matrix[i][j] == 0){
+					row = i;
+					col = j;
+					return false;
+				}
+			}
 		}
+		
 		return true;
 	}
 
-	/* Check if position and value is safe to filled */
-	public int filled(int x, int y, int value) {
+	/* Check if there is no same number in vertical and horizontal position */
+	public boolean isSafe(int x, int y, int value) {
 
 		// Check Horizontal
 		for (int i = 0; i < 9; i++) {
-			if (i != y && matrix[x][i] == value) {
-				return 0;
+			if (i != y && matrix[row][i] == value) {
+				return false;
 			}
 		}
 
 		// Check Vertical
 		for (int i = 0; i < 9; i++) {
-			if (i != x && matrix[i][y] == value) {
-				return 0;
+			if (i != x && matrix[i][col] == value) {
+				return false;
 			}
 		}
 
-		return value;
+		return true;
 
 	}
 
-	/* Solve the problem */
-	public boolean solve(int x, int y) {
-
-		if (matrix[x][y] == 0) {
-			for (int i = 1; i <= 9; i++) {
-				if (filled(x, y, i) != 0) {
-					matrix[x][y] = i;
-					break;
-				}
-			}
-		}
-
-		for (int i = 0; i < 9; i++) {
-
-			for (int j = 0; j < 9; j++) {
-				if (matrix[i][j] == 0) {
-					return solve(i, j);
-				}
-			}
-		}
-
-
-		if (matrix[x][y] != 0) {
+	/* Solution */
+	public boolean solve() {
+		int curRow, curCol;
+		curRow = row;
+		curCol = col;
+		
+		if (isFull()) {
 			return true;
 		}
 
-
-
-		matrix[x][y] = 0;
-
-
-
+		for(int i=1;i<=9;i++){
+			if(isSafe(row, col, i)){
+				matrix[row][col] = i;
+				if(solve()){
+					return true;
+				}
+				matrix[row][col] = 0;
+			}
+		}
+		
+		
+		matrix[curRow][curCol] = 0;
+		
 		return false;
 	}
 
@@ -113,7 +110,7 @@ public class Sudoku {
 			SudokuSolver s = new SudokuSolver(matrix);
 
 
-			if (s.solve(0, 0)) {
+			if (s.solve()) {
 				s.printResult();
 			} else {
 				System.out.println("Solution not found");
