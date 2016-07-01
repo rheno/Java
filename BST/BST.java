@@ -1,3 +1,5 @@
+import java.util.Queue;
+import java.util.LinkedList;
 
 class Node{
    
@@ -15,18 +17,89 @@ class Node{
 
 public class BST{
 
+  private Node root;
+
+  public BST(){
+	this.root = null;
+  }
+
+  public Node getRoot(){
+	return root;
+  }
+
+  public void insert(int data){
+	this.root = insert(data, this.root);
+  }
+
   public Node insert(int data, Node root){
       
       if(root == null){
 	 root = new Node(data, null, null);
-      }else if(data > root.data){
-	 root.right = insert(data, root.right);
-      }else if(data < root.data){
+      }else if(root.data > data){
 	 root.left = insert(data, root.left);
+      }else if(root.data < data){
+	 root.right = insert(data, root.right);
       }
    
       return root;
   }   
+
+  public void deleteAt(int data){
+	this.root = deleteAt(data, this.root);
+  }
+
+  public Node deleteAt(int data, Node root){
+	if(root == null){
+		root = null;
+	}else if(root.data == data){
+		if(root.left == null && root.right == null){
+			root = null;
+		}else if(root.left != null && root.right == null){
+			Node del = root;
+			root = root.left;
+			del = null;
+		}else if(root.left == null && root.right != null){
+			Node del = root;
+			root = root.right;
+			del = null;
+		}else if(root.left != null && root.right != null){
+			Node right = root.right;
+			root = root.left;
+			getMostRight(root).right = right;
+		}
+	}else if(root.data > data){
+		root.left = deleteAt(data, root.left);
+	}else if(root.data < data){
+		root.right = deleteAt(data, root.right);
+	}	
+	
+	return root;
+  }
+
+  public Node getMostRight(Node root){
+	
+	if(root == null){
+		return null;
+	}
+		
+	if(root.right == null){
+		return root;
+	}
+	
+	return getMostRight(root.right);		
+  }
+
+  public Node getMostLeft(Node root){
+	if(root == null){
+		return null;
+	}
+
+	if(root.left == null){
+		return root;
+	}
+
+	return getMostLeft(root.left);
+  }
 
   public int width(Node root){
 
@@ -53,14 +126,64 @@ public class BST{
        return r;
   }
 
-  public void printBST(Node root){
+  public void printPreOrder(Node root){
+	if(root == null){
+		return;
+	}
+
+	printPreOrder(root.left);
+	System.out.println(root.data);
+	printPreOrder(root.right);
+
+  }
+
+  public void printInOrder(Node root){
       
       if(root == null){
 	return;
       }
       System.out.println(root.data);	
-      printBST(root.left);
-      printBST(root.right);
+      printInOrder(root.left);
+      printInOrder(root.right);
+  }
+
+  public void printPostOrder(Node root){
+	if(root == null){
+		return;
+	}
+	
+	printPostOrder(root.left);
+	printPostOrder(root.right);
+	System.out.println(root.data);
+  }
+
+  public void printLevelOrder(Node root){
+	if(root == null){
+		return;
+	}
+
+	Queue<Node> q = new LinkedList<Node>();
+	q.add(root);
+
+	while(q.size() != 0){
+		
+		int size = q.size();
+		
+		while(size > 0){
+			Node curr = q.peek();
+			System.out.print(curr.data+" ");
+			if(curr.left != null){
+				q.add(curr.left);
+			}
+
+			if(curr.right != null){
+				q.add(curr.right);
+			}
+			size--;					
+			q.remove();
+		}
+		System.out.println();
+	}
   }
   
 
